@@ -6,10 +6,10 @@ AttitudeMeasurement::AttitudeMeasurement(const char* platformID
                                          , const QString &portName
                                          , double sensitivityCH1
                                          , double sensitivityCH2)
-    : scanner_(new Scanner(scannerID_))
-    , platformX_(new MotionPlatform(platformID, CH1))
+    : platformX_(new MotionPlatform(platformID, CH1))
     , platformY_(new MotionPlatform(platformID, CH2))
     , platformZ_(new MotionPlatform(platformID, CH3))
+    , scanner_(new Scanner(scannerID_))
     , forceSensor_(new ForceSensor(portName, sensitivityCH1, sensitivityCH2))
     , platformID_(platformID)
     , portName_(portName)
@@ -268,3 +268,46 @@ bool AttitudeMeasurement::moveJointPositions(const Eigen::Vector3d& target_posit
 //     scanner_->closeCloseLoopControll();
 //     return 1;
 // }
+
+
+bool AttitudeMeasurement::setMicroPosition(signed int position)
+{
+    scanner_->gotoPosition(position);
+    return true;
+}
+bool AttitudeMeasurement::setMicroPositionRelative(signed int diff)
+{
+    scanner_->gotoPositionRelative(diff);
+    return true;
+}
+bool AttitudeMeasurement::setMicroVelocity(signed int velocity)
+{
+    scanner_->setVelocity(velocity);
+    return true;
+}
+
+bool AttitudeMeasurement::setMicroVoltage(unsigned int Voltage)
+{
+    scanner_->scanMoveAbsolute(Voltage);
+    return true;
+}
+
+bool AttitudeMeasurement::setMicroVoltageRelative(int diff_Voltage)
+{
+    scanner_->scanMoveRelative(diff_Voltage);
+    return true;
+}
+
+
+bool AttitudeMeasurement::getMicroVelocity(int &velocity)
+{
+    scanner_->getVelocity(velocity);
+    return true;
+}
+
+bool AttitudeMeasurement::getMicroVoltage(unsigned int &Voltage)
+{
+    scanner_->getVoltage(Voltage);
+    return true;
+}
+

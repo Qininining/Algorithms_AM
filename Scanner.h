@@ -29,7 +29,7 @@ public:
     // bool gotoPositionRelative(signed int diff);
 
     bool getPosition(double &position, unsigned int adc);
-    bool getVelocity(double &velocity);
+    bool getVelocity(int &velocity);
 
     bool scanMoveAbsolute(unsigned int target, unsigned int scanStep = 1000, unsigned int scanDelay = 10);
     bool scanMoveRelative(int diff, unsigned int scanStep = 1, unsigned int scanDelay = 10);
@@ -80,6 +80,7 @@ private:
     QVector<double> positionBuffer_; ///< 用于存储位置的循环缓冲区。
     int bufferIndex_; ///< 当前写入缓冲区的位置索引。
     const int bufferSize_; ///< 缓冲区大小，可以调整为适当值。
+    int count;
     MoveMode scanMoveMode; ///< 运动模式，1代表位置PID控制，2代表速度Pid控制
 
 

@@ -16,6 +16,7 @@ Scanner::Scanner(const char* ID)
     , PIDupdateThread_(new QThread())
     , bufferIndex_(0)
     , bufferSize_(5)
+    , count(0)
     , scanMoveMode(NoMove)
 {
     positionBuffer_.resize(bufferSize_);
@@ -41,7 +42,6 @@ Scanner::~Scanner()
         PIDupdateThread_->quit();
         PIDupdateThread_->wait(50); // 等待最多0.05秒
     }
-
 }
 
 void Scanner::update()
@@ -50,22 +50,26 @@ void Scanner::update()
     positionBuffer_[bufferIndex_] = position_;
     bufferIndex_ = (bufferIndex_ + 1) % bufferSize_; // 循环更新索引
 
+    if(count < bufferSize_){
+        count ++;
+    }
+
+
     // 计算平均速度，考虑方向
-    if (isOpen_) { // 确保只有在连接状态下才进行计算
+    if (isOpen_ && (count >= bufferSize_)) { // 确保只有在连接状态下才进行计算
         double totalDisplacement = 0;
 
-        // 如果缓冲区已满，则开始计算速度
-        if (positionBuffer_.size() == bufferSize_) {
-            // 从最新的位置向前遍历，以保持正确的顺序
-            for (int i = 0; i < bufferSize_ - 1; ++i) {
-                int currentIndex = (bufferIndex_ + bufferSize_ - 1 - i) % bufferSize_;
-                int nextIndex = (currentIndex + bufferSize_ - 1) % bufferSize_;
-                totalDisplacement += (positionBuffer_[currentIndex] - positionBuffer_[nextIndex]);
-            }
-            // 平均速度 = 总位移 / 时间间隔总和
-            // 注意这里的时间间隔是基于updateTimer_的周期，即20ms
-            velocity_ = int(totalDisplacement / (bufferSize_ * 0.02)); // 20ms转换为秒
+
+        // 从最新的位置向前遍历，以保持正确的顺序
+        for (int i = 0; i < bufferSize_ - 1; ++i) {
+            int currentIndex = (bufferIndex_ + bufferSize_ - 1 - i) % bufferSize_;
+            int nextIndex = (currentIndex + bufferSize_ - 1) % bufferSize_;
+            totalDisplacement += (positionBuffer_[currentIndex] - positionBuffer_[nextIndex]);
         }
+        // 平均速度 = 总位移 / 时间间隔总和
+        // 注意这里的时间间隔是基于updateTimer_的周期，即20ms
+        velocity_ = int(totalDisplacement / (bufferSize_ * 0.02)); // 20ms转换为秒
+
     }
 
     PidVelocity_->setCurrentPoint(velocity_);
@@ -171,7 +175,7 @@ bool Scanner::switchMode(MoveMode MoveMode)
 
 
 
-bool Scanner::getVelocity(double &velocity)
+bool Scanner::getVelocity(int &velocity)
 {
     velocity = velocity_;
     return true;

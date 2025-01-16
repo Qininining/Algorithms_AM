@@ -39,8 +39,6 @@ public:
             : position(pos), status(stat), force(frc), scanPositon(scanpos){}
     };
 
-    Scanner * scanner_;
-
 
 public:
     bool initialize();           // 初始化设备
@@ -51,6 +49,12 @@ public:
     bool moveTaskVelocities(const Eigen::Vector3d& target_velocities);
     bool moveJointPositions(const Eigen::Vector3d& target_positions);
     bool moveJointVelocities(const Eigen::Vector3d& target_velocities);
+
+    bool setMicroPosition(signed int position);
+    bool setMicroPositionRelative(signed int diff);
+    bool setMicroVelocity(signed int velocity);
+    bool setMicroVoltage(unsigned int Voltage);
+    bool setMicroVoltageRelative(int diff_Voltage);
 
     // 获取最新的 MeasurementData
     bool getData(MeasurementData &latestData);
@@ -71,6 +75,10 @@ public:
     bool getJointVelocities(Eigen::VectorXd& velocities);
     bool getCurrentProbePosition(Eigen::Vector3d& position);
 
+    bool getMicroVelocity(int &velocity);
+    bool getMicroVoltage(unsigned int &Voltage);
+
+
     // bool openScanCloseLoop();
     // bool closeScanCloseLoop();
 
@@ -81,6 +89,8 @@ private:
     MotionPlatform *platformX_;
     MotionPlatform *platformY_;
     MotionPlatform *platformZ_;
+
+    Scanner * scanner_;
 
     ForceSensor *forceSensor_;
 
